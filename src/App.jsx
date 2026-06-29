@@ -2,7 +2,7 @@ import { Routes, Route, BrowserRouter, Navigate,} from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage";
-import ChatPage from "./pages/ChatPage";
+import ChatPage from "./pages/Chatpage";
 
 function App() {
   return (
