@@ -26,7 +26,7 @@ function ChatHeader({
   onRoomUpdated,
   onRoomDeleted,
   onMessagesCleared,
-}){
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -56,7 +56,7 @@ function ChatHeader({
             justifyContent: "space-between",
           }}
         >
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Avatar
               sx={{
                 bgcolor: "#2563eb",
@@ -84,7 +84,7 @@ function ChatHeader({
             </Box>
           </Box>
 
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {searchOpen ? (
               <TextField
                 autoFocus

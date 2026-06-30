@@ -1,36 +1,38 @@
 import { useEffect, useState } from "react";
 
 import {
+  Avatar,
   Box,
-  Typography,
+  Button,
+  CircularProgress,
+  Divider,
+  Drawer,
+  InputAdornment,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Button,
-  Divider,
-  Avatar,
   TextField,
-  InputAdornment,
-  CircularProgress,
-  Drawer,
+  Typography,
 } from "@mui/material";
 
 import ChatRoundedIcon from "@mui/icons-material/ChatRounded";
 import TagRoundedIcon from "@mui/icons-material/TagRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+
 import CreateRoomDialog from "./CreateRoomDialog";
 import ProfileDialog from "./ProfileDialog";
-import {
-  getRooms,
-  getFriends,
-  createOrGetDirectChat,
-} from "../services/chatservice";
 import SearchUserDialog from "./SearchUserDialog";
 import FriendRequestsDialog from "./FriendRequestsDialog";
 
-const drawerWidth = 300;
+import {
+  createOrGetDirectChat,
+  getFriends,
+  getRooms,
+} from "../services/chatservice";
+
+const drawerWidth = 360;
 
 function Sidebar({
   mobileOpen,
@@ -45,19 +47,22 @@ function Sidebar({
   const [rooms, setRooms] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [openCreateRoom, setOpenCreateRoom] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [openSearchUser, setOpenSearchUser] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const [openRequests, setOpenRequests] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   const filteredRooms = rooms.filter((room) =>
-    room.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   function handleLogout() {
     localStorage.clear();
-
     window.location.href = "/";
   }
 
@@ -65,14 +70,14 @@ function Sidebar({
     try {
       setLoading(true);
 
-      const data = await getRooms();
+      const roomData = await getRooms();
+      setRooms(roomData);
 
-      setRooms(data);
       const friendData = await getFriends(user.id);
       setFriends(friendData);
 
-      if (data.length > 0 && !selectedRoom) {
-        setSelectedRoom(data[0]);
+      if (roomData.length > 0 && !selectedRoom) {
+        setSelectedRoom(roomData[0]);
       }
     } catch (err) {
       console.error(err);
@@ -80,6 +85,7 @@ function Sidebar({
       setLoading(false);
     }
   }
+
   async function handleFriendClick(friend) {
     try {
       const chat = await createOrGetDirectChat(user.id, friend.id);
@@ -90,8 +96,8 @@ function Sidebar({
         ...chat,
         friend,
       });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -103,46 +109,64 @@ function Sidebar({
     <Box
       sx={{
         height: "100%",
-        bgcolor: "#0f172a",
-        color: "white",
         display: "flex",
         flexDirection: "column",
+        bgcolor: "#0F172A",
+        color: "white",
+        overflow: "hidden",
       }}
     >
-      {/* Header */}
+      {/* ================= HEADER ================= */}
+
       <Box
         sx={{
           px: 3,
-          py: 3,
+          pt: 3,
+          pb: 2,
+          flexShrink: 0,
         }}
       >
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Avatar
             sx={{
-              width: 54,
-              height: 54,
-              bgcolor: "#2563eb",
+              width: 62,
+              height: 62,
+              bgcolor: "#2563EB",
+              boxShadow: "0 10px 30px rgba(37,99,235,.45)",
             }}
           >
-            <ChatRoundedIcon />
+            <ChatRoundedIcon sx={{ fontSize: 34 }} />
           </Avatar>
 
           <Box>
-            <Typography fontWeight={700} fontSize={24}>
+            <Typography
+              sx={{
+                fontWeight: 800,
+                fontSize: 28,
+                lineHeight: 1,
+              }}
+            >
               ChatSphere
             </Typography>
 
-            <Typography fontSize={13} color="#94a3b8">
-              Connect & Collaborate
+            <Typography
+              sx={{
+                mt: 0.5,
+                color: "#94A3B8",
+                fontSize: 14,
+              }}
+            >
+              Connect • Chat • Collaborate
             </Typography>
           </Box>
         </Box>
       </Box>
-      {/* Search */}
-      <Box px={3}>
+
+      {/* ================= SEARCH ================= */}
+
+      <Box px={3} sx={{ flexShrink: 0 }}>
         <TextField
           fullWidth
-          size="small"
           placeholder="Search rooms..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -151,124 +175,124 @@ function Sidebar({
               <InputAdornment position="start">
                 <SearchRoundedIcon
                   sx={{
-                    color: "#94a3b8",
+                    color: "#94A3B8",
                   }}
                 />
               </InputAdornment>
             ),
           }}
           sx={{
-            mb: 2,
-
             "& .MuiOutlinedInput-root": {
-              bgcolor: "#1e293b",
-              borderRadius: 3,
+              bgcolor: "#1E293B",
+              borderRadius: "16px",
               color: "white",
+              height: 52,
 
               "& fieldset": {
                 border: "none",
               },
-            },
 
-            "& input": {
-              color: "white",
+              "&:hover": {
+                bgcolor: "#273449",
+              },
+
+              "&.Mui-focused": {
+                bgcolor: "#273449",
+              },
             },
 
             "& input::placeholder": {
-              color: "#94a3b8",
+              color: "#94A3B8",
               opacity: 1,
             },
           }}
         />
       </Box>
-      {/* Create Room */}
-      <Box px={3}>
+
+      {/* ================= ACTION BUTTONS ================= */}
+
+      <Box
+        sx={{
+          px: 3,
+          mt: 3,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1.5,
+          flexShrink: 0,
+        }}
+      >
         <Button
           fullWidth
           variant="contained"
           startIcon={<AddRoundedIcon />}
           onClick={() => setOpenCreateRoom(true)}
           sx={{
-            py: 1.3,
+            height: 52,
             borderRadius: 3,
-            textTransform: "none",
             fontWeight: 700,
             fontSize: 15,
+            textTransform: "none",
           }}
         >
           Create Room
         </Button>
-      </Box>
-      <Box px={3} mt={1}>
+
         <Button
           fullWidth
           variant="outlined"
           onClick={() => setOpenSearchUser(true)}
           sx={{
-            py: 1.2,
+            height: 50,
             borderRadius: 3,
             textTransform: "none",
-            fontWeight: 700,
             color: "white",
-            borderColor: "#475569",
+            borderColor: "#334155",
 
             "&:hover": {
-              borderColor: "#60a5fa",
-              bgcolor: "#1e293b",
+              borderColor: "#60A5FA",
+              bgcolor: "#1E293B",
             },
           }}
         >
           Add Friend
         </Button>
-      </Box>
-      <Box px={3} mt={1}>
+
         <Button
           fullWidth
           variant="outlined"
           onClick={() => setOpenRequests(true)}
           sx={{
-            py: 1.2,
+            height: 50,
             borderRadius: 3,
             textTransform: "none",
-            fontWeight: 700,
             color: "white",
-            borderColor: "#475569",
+            borderColor: "#334155",
 
             "&:hover": {
-              borderColor: "#60a5fa",
-              bgcolor: "#1e293b",
+              borderColor: "#60A5FA",
+              bgcolor: "#1E293B",
             },
           }}
         >
           Friend Requests
         </Button>
       </Box>
+
       <Divider
         sx={{
           my: 3,
-          bgcolor: "#1e293b",
+          bgcolor: "#1E293B",
+          flexShrink: 0,
         }}
       />
-      {/* Room Title */}
-      <Typography
-        sx={{
-          px: 3,
-          pb: 1,
-          color: "#94a3b8",
-          fontWeight: 700,
-          fontSize: 13,
-          letterSpacing: 1.2,
-        }}
-      >
-        ROOMS
-      </Typography>
-      {/* Rooms List */}
+
+      {/* ================= ROOMS + DIRECT MESSAGES (shared scroll) ================= */}
+
       <Box
         sx={{
           flex: 1,
+          minHeight: 0,
           overflowY: "auto",
-          px: 2,
-          pb: 2,
 
           "&::-webkit-scrollbar": {
             width: 6,
@@ -276,29 +300,50 @@ function Sidebar({
 
           "&::-webkit-scrollbar-thumb": {
             background: "#334155",
-            borderRadius: 10,
+            borderRadius: 20,
           },
         }}
       >
+        <Typography
+          sx={{
+            px: 3,
+            pb: 1.5,
+            color: "#94A3B8",
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: 2,
+          }}
+        >
+          ROOMS
+        </Typography>
+
+        <Box
+          sx={{
+            px: 2,
+            pr: 1.5,
+          }}
+        >
         {loading ? (
           <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            mt={6}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 6,
+            }}
           >
             <CircularProgress color="inherit" size={30} />
           </Box>
         ) : filteredRooms.length === 0 ? (
-          <Box
+          <Typography
             sx={{
-              mt: 6,
+              color: "#94A3B8",
               textAlign: "center",
-              color: "#94a3b8",
+              mt: 6,
             }}
           >
-            <Typography fontSize={14}>No matching rooms</Typography>
-          </Box>
+            No rooms found
+          </Typography>
         ) : (
           <List disablePadding>
             {filteredRooms.map((room) => (
@@ -307,39 +352,38 @@ function Sidebar({
                 selected={selectedRoom?.id === room.id}
                 onClick={() => {
                   setSelectedRoom(room);
+                  setSelectedDirectChat(null);
 
                   if (isMobile) {
                     handleDrawerToggle();
                   }
                 }}
                 sx={{
-                  borderRadius: 3,
-                  mb: 0.7,
+                  mb: 1,
                   px: 2,
-                  py: 1.3,
-                  transition: ".2s",
-
-                  "& .MuiListItemIcon-root": {
-                    color: "#60a5fa",
-                  },
+                  py: 1.5,
+                  borderRadius: 4,
+                  transition: ".25s",
 
                   "&:hover": {
-                    bgcolor: "#1e293b",
+                    bgcolor: "#1E293B",
+                    transform: "translateX(4px)",
                   },
 
                   "&.Mui-selected": {
-                    bgcolor: "#2563eb",
-                    boxShadow: "0 6px 20px rgba(37,99,235,.35)",
+                    bgcolor: "#2563EB",
+                    boxShadow: "0 10px 25px rgba(37,99,235,.35)",
                   },
 
                   "&.Mui-selected:hover": {
-                    bgcolor: "#1d4ed8",
+                    bgcolor: "#1D4ED8",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    minWidth: 36,
+                    minWidth: 40,
+                    color: selectedRoom?.id === room.id ? "white" : "#60A5FA",
                   }}
                 >
                   <TagRoundedIcon />
@@ -348,44 +392,51 @@ function Sidebar({
                 <ListItemText
                   primary={room.name}
                   primaryTypographyProps={{
-                    fontWeight: selectedRoom?.id === room.id ? 600 : 500,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    color: "white",
                   }}
                 />
               </ListItemButton>
             ))}
           </List>
         )}
-      </Box>
-      <Divider
-        sx={{
-          bgcolor: "#1e293b",
-        }}
-      />{" "}
-      {/* Direct Messages */}
-      <Typography
-        sx={{
-          px: 3,
-          py: 1,
-          color: "#94a3b8",
-          fontWeight: 700,
-          fontSize: 13,
-          letterSpacing: 1.2,
-        }}
-      >
-        DIRECT MESSAGES
-      </Typography>
-      <Box
-        sx={{
-          px: 2,
-          pb: 2,
-        }}
-      >
+        </Box>
+
+        <Divider
+          sx={{
+            bgcolor: "#1E293B",
+            mt: 1,
+          }}
+        />
+
+        {/* ================= DIRECT MESSAGES ================= */}
+
+        <Typography
+          sx={{
+            px: 3,
+            py: 2,
+            color: "#94A3B8",
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: 2,
+          }}
+        >
+          DIRECT MESSAGES
+        </Typography>
+
+        <Box
+          sx={{
+            px: 2,
+            pb: 2,
+          }}
+        >
         {friends.length === 0 ? (
           <Typography
             sx={{
-              color: "#94a3b8",
-              fontSize: 13,
+              color: "#94A3B8",
               px: 2,
+              fontSize: 13,
             }}
           >
             No friends yet
@@ -395,40 +446,52 @@ function Sidebar({
             {friends.map((friend) => (
               <ListItemButton
                 key={friend.id}
-                selected={selectedDirectChat?.id === friend.id}
+                selected={selectedDirectChat?.friend?.id === friend.id}
                 onClick={() => handleFriendClick(friend)}
                 sx={{
-                  borderRadius: 3,
-                  mb: 0.7,
+                  borderRadius: 4,
+                  mb: 1,
+                  py: 1.2,
 
                   "&:hover": {
-                    bgcolor: "#1e293b",
+                    bgcolor: "#1E293B",
+                  },
+
+                  "&.Mui-selected": {
+                    bgcolor: "#1E40AF",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    minWidth: 40,
+                    minWidth: 50,
                   }}
                 >
                   <Avatar
+                    src={friend.profile_picture || ""}
                     sx={{
-                      width: 32,
-                      height: 32,
-                      bgcolor: "#22c55e",
-                      fontSize: 15,
+                      width: 42,
+                      height: 42,
+                      bgcolor: "#22C55E",
+                      fontWeight: 700,
                     }}
                   >
-                    {friend.username.charAt(0).toUpperCase()}
+                    {!friend.profile_picture &&
+                      friend.username?.charAt(0).toUpperCase()}
                   </Avatar>
                 </ListItemIcon>
 
                 <ListItemText
                   primary={friend.username}
                   secondary={friend.email}
+                  primaryTypographyProps={{
+                    fontWeight: 600,
+                    color: "white",
+                    fontSize: 14,
+                  }}
                   secondaryTypographyProps={{
                     sx: {
-                      color: "#94a3b8",
+                      color: "#94A3B8",
                       fontSize: 11,
                     },
                   }}
@@ -437,54 +500,51 @@ function Sidebar({
             ))}
           </List>
         )}
+        </Box>
       </Box>
+
       <Divider
         sx={{
-          bgcolor: "#1e293b",
+          bgcolor: "#1E293B",
+          flexShrink: 0,
         }}
       />
-      {/* Logged In User */}
-      <Box
-        onClick={() => setOpenProfile(true)}
-        sx={{
-          p: 2,
-          bgcolor: "#111827",
-          cursor: "pointer",
 
-          "&:hover": {
-            bgcolor: "#1f2937",
-          },
+      {/* ================= PROFILE SECTION ================= */}
+
+      <Box
+        sx={{
+          p: 2.5,
+          bgcolor: "#111827",
+          borderTop: "1px solid #1E293B",
+          flexShrink: 0,
         }}
       >
+        {/* User Card */}
         <Box
+          onClick={() => setOpenProfile(true)}
           sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
             p: 2,
-            pt: 0,
-            bgcolor: "#111827",
+            borderRadius: 4,
+            cursor: "pointer",
+            transition: ".25s",
+
+            "&:hover": {
+              bgcolor: "#1E293B",
+            },
           }}
         >
-          <Button
-            fullWidth
-            variant="outlined"
-            color="error"
-            onClick={handleLogout}
-            sx={{
-              textTransform: "none",
-              borderRadius: 3,
-            }}
-          >
-            Logout
-          </Button>
-        </Box>
-        <Box display="flex" alignItems="center" gap={2}>
           <Avatar
             src={user?.profile_picture || ""}
             sx={{
-              width: 48,
-              height: 48,
-              bgcolor: "#2563eb",
-              fontWeight: "bold",
-              fontSize: 20,
+              width: 56,
+              height: 56,
+              bgcolor: "#2563EB",
+              fontSize: 22,
+              fontWeight: 700,
             }}
           >
             {!user?.profile_picture &&
@@ -497,35 +557,48 @@ function Sidebar({
               overflow: "hidden",
             }}
           >
-            <Typography fontWeight={700} noWrap>
+            <Typography
+              noWrap
+              sx={{
+                fontWeight: 700,
+                fontSize: 16,
+              }}
+            >
               {user?.username || "Guest"}
             </Typography>
 
             <Typography
-              variant="body2"
               noWrap
               sx={{
-                color: "#94a3b8",
+                color: "#94A3B8",
                 fontSize: 12,
               }}
             >
               {user?.email || "No Email"}
             </Typography>
 
-            <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                mt: 0.8,
+              }}
+            >
               <Box
                 sx={{
-                  width: 8,
-                  height: 8,
+                  width: 9,
+                  height: 9,
                   borderRadius: "50%",
-                  bgcolor: "#22c55e",
+                  bgcolor: "#22C55E",
                 }}
               />
 
               <Typography
                 sx={{
-                  color: "#22c55e",
+                  color: "#22C55E",
                   fontSize: 12,
+                  fontWeight: 600,
                 }}
               >
                 Online
@@ -533,6 +606,30 @@ function Sidebar({
             </Box>
           </Box>
         </Box>
+
+        {/* Logout Button */}
+
+        <Button
+          fullWidth
+          variant="contained"
+          color="error"
+          onClick={handleLogout}
+          sx={{
+            mt: 2.5,
+            height: 50,
+            borderRadius: 3,
+            textTransform: "none",
+            fontWeight: 700,
+            fontSize: 15,
+            boxShadow: "none",
+
+            "&:hover": {
+              boxShadow: "0 10px 20px rgba(239,68,68,.35)",
+            },
+          }}
+        >
+          Logout
+        </Button>
       </Box>
     </Box>
   );
@@ -552,10 +649,14 @@ function Sidebar({
               xs: "block",
               md: "none",
             },
+
             "& .MuiDrawer-paper": {
               width: drawerWidth,
               border: "none",
-              bgcolor: "#0f172a",
+              bgcolor: "#0F172A",
+              height: "100vh",
+              maxHeight: "100vh",
+              overflow: "hidden",
             },
           }}
         >
@@ -570,18 +671,18 @@ function Sidebar({
             setSelectedRoom(room);
           }}
         />
+
         <SearchUserDialog
           open={openSearchUser}
           onClose={() => setOpenSearchUser(false)}
         />
+
         <FriendRequestsDialog
           open={openRequests}
           onClose={() => setOpenRequests(false)}
         />
-        <ProfileDialog
-          open={openProfile}
-          onClose={() => setOpenProfile(false)}
-        />
+
+        <ProfileDialog open={openProfile} onClose={() => setOpenProfile(false)} />
       </>
     );
   }
@@ -595,13 +696,19 @@ function Sidebar({
             xs: "none",
             md: "block",
           },
+
           width: drawerWidth,
           flexShrink: 0,
+
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             border: "none",
-            bgcolor: "#0f172a",
+            bgcolor: "#0F172A",
             boxSizing: "border-box",
+            boxShadow: "8px 0 30px rgba(0,0,0,.18)",
+            height: "100vh",
+            maxHeight: "100vh",
+            overflow: "hidden",
           },
         }}
       >
@@ -616,14 +723,17 @@ function Sidebar({
           setSelectedRoom(room);
         }}
       />
+
       <SearchUserDialog
         open={openSearchUser}
         onClose={() => setOpenSearchUser(false)}
       />
+
       <FriendRequestsDialog
         open={openRequests}
         onClose={() => setOpenRequests(false)}
       />
+
       <ProfileDialog open={openProfile} onClose={() => setOpenProfile(false)} />
     </>
   );

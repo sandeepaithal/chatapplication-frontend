@@ -54,8 +54,9 @@ function ChatPage() {
           flex: 1,
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
           overflow: "hidden",
-          bgcolor: "#f8fafc",
+          bgcolor: "#f4f6fb",
         }}
       >
         <ChatHeader
@@ -68,18 +69,37 @@ function ChatPage() {
           onMessagesCleared={handleMessagesCleared}
         />
 
-        <MessageList
-          room={selectedRoom}
-          directChat={selectedDirectChat}
-          refreshKey={refreshKey}
-          searchText={searchText}
-        />
+        <Box
+          sx={{
+            flex: 1,
+            px: 4,
+            py: 2,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <MessageList
+            room={selectedRoom}
+            directChat={selectedDirectChat}
+            refreshKey={refreshKey}
+            searchText={searchText}
+          />
+        </Box>
 
-        <MessageInput
-          room={selectedRoom}
-          directChat={selectedDirectChat}
-          onMessageSent={refreshMessages}
-        />
+        <Box
+          sx={{
+            px: 3,
+            pb: 2,
+            bgcolor: "#f4f6fb",
+          }}
+        >
+          <MessageInput
+            room={selectedRoom}
+            directChat={selectedDirectChat}
+            onMessageSent={refreshMessages}
+          />
+        </Box>
       </Box>
     </Layout>
   );

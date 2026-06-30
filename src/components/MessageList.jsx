@@ -3,17 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
 import MessageBubble from "./MessageBubble";
-import {
-  getRoomMessages,
-  getDirectMessages,
-} from "../services/chatservice";
+import { getRoomMessages, getDirectMessages } from "../services/chatservice";
 
-function MessageList({
-  room,
-  directChat,
-  refreshKey,
-  searchText,
-}) {
+function MessageList({ room, directChat, refreshKey, searchText }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -114,9 +106,18 @@ function MessageList({
     <Box
       sx={{
         flex: 1,
-        overflowY: "auto",
+        overflowY: "scroll",
         p: 3,
         bgcolor: "#f8fafc",
+
+        // Hide scrollbar visually while keeping scroll functional
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // IE/old Edge
+        "&::-webkit-scrollbar": {
+          width: 0,
+          height: 0,
+          display: "none", // Chrome, Safari, Edge (Chromium)
+        },
       }}
     >
       {loading ? (
